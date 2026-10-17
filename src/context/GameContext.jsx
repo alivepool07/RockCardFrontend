@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { stompService } from '../services/stompClient';
 
 const GameContext = createContext(null);
@@ -19,6 +19,16 @@ export const GameProvider = ({ children }) => {
   const [errorToast, setErrorToast] = useState(null);
   const [infoToast, setInfoToast] = useState(null);
 
+  // Stable refs to break re-render cycles in background synchronization
+  const roomIdRef = useRef(roomId);
+  const playerIdRef = useRef(playerId);
+  const usernameRef = useRef(username);
+  const isFetchingRef = useRef(false);
+
+  useEffect(() => { roomIdRef.current = roomId; }, [roomId]);
+  useEffect(() => { playerIdRef.current = playerId; }, [playerId]);
+  useEffect(() => { usernameRef.current = username; }, [username]);
+
   // Show temporary toast
   const showToast = useCallback((msg, isError = false) => {
     if (isError) {
@@ -37,7 +47,7 @@ export const GameProvider = ({ children }) => {
     });
 
     stompService.connect().catch((err) => {
-      console.error('STOMP connection error:', err);
+      console.warn('STOMP initial connection notice:', err);
       setConnected(false);
     });
 
@@ -64,8 +74,8 @@ export const GameProvider = ({ children }) => {
         if (data.hand) {
           setMyHand(data.hand);
         }
-        setHasSubmitted(!!data.hasSubmitted);
-        setIsJudge(!!data.isJudge);
+        setHasSubmitted(Boolean(data.hasSubmitted));
+        setIsJudge(Boolean(data.isJudge));
       }
     });
 
@@ -84,10 +94,32 @@ export const GameProvider = ({ children }) => {
     };
   }, [showToast]);
 
-  // Refresh room state directly via REST to survive reloads and missed WebSocket messages
+  // REST fallback to fetch player hand directly
+  const fetchHand = useCallback(async (targetRoom, targetPid) => {
+    const r = targetRoom || roomIdRef.current;
+    const p = targetPid || playerIdRef.current;
+    if (!r || !p) return;
+    try {
+      const res = await fetch(`${API_BASE}/api/room/${r}/hand/${p}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.hand && Array.isArray(data.hand)) {
+          setMyHand(data.hand);
+        }
+        setHasSubmitted(Boolean(data.hasSubmitted));
+        setIsJudge(Boolean(data.isJudge));
+      }
+    } catch (e) {
+      // non-critical, will retry or receive via STOMP
+    }
+  }, []);
+
+  // Refresh room state directly via REST without recreating functions or causing infinite loops
   const refreshRoomState = useCallback(async (targetRoomId) => {
-    const code = targetRoomId || roomId;
-    if (!code) return;
+    const code = targetRoomId || roomIdRef.current;
+    if (!code || isFetchingRef.current) return;
+    isFetchingRef.current = true;
+
     try {
       const res = await fetch(`${API_BASE}/api/room/${code}`);
       if (res.status === 404) {
@@ -101,15 +133,19 @@ export const GameProvider = ({ children }) => {
       if (res.ok) {
         const data = await res.json();
         setRoomState(data);
+
         if (data.players) {
+          const currentPid = playerIdRef.current;
+          const currentUname = usernameRef.current;
           const me = data.players.find((p) => 
-            (playerId && p.id === playerId) ||
-            (username && p.username.trim().toLowerCase() === username.trim().toLowerCase())
+            (currentPid && p.id === currentPid) ||
+            (currentUname && p.username.trim().toLowerCase() === currentUname.trim().toLowerCase())
           );
           if (me) {
-            if (!playerId || playerId !== me.id) {
+            if (currentPid !== me.id) {
               setPlayerId(me.id);
               sessionStorage.setItem('cah_playerId', me.id);
+              playerIdRef.current = me.id;
             }
             setHasSubmitted(Boolean(me.hasSubmitted));
             setIsJudge(Boolean(me.isJudge));
@@ -117,19 +153,21 @@ export const GameProvider = ({ children }) => {
         }
       }
     } catch (err) {
-      // ignore network blips
+      // network blip ignored
+    } finally {
+      isFetchingRef.current = false;
     }
-  }, [roomId, playerId, username]);
+  }, []);
 
-  // Initial load and periodic background sync (every 2.5s) to guarantee no stale states or missing players
+  // Periodic background sync (calm 3.5s interval) only active when inside a room
   useEffect(() => {
     if (!roomId) return;
 
     refreshRoomState(roomId);
 
     const interval = setInterval(() => {
-      refreshRoomState(roomId);
-    }, 2500);
+      refreshRoomState(roomIdRef.current);
+    }, 3500);
 
     return () => clearInterval(interval);
   }, [roomId, refreshRoomState]);
@@ -138,8 +176,9 @@ export const GameProvider = ({ children }) => {
   useEffect(() => {
     if (connected && roomId && playerId) {
       stompService.send('/app/room.hand', { roomId, playerId });
+      fetchHand(roomId, playerId);
     }
-  }, [connected, roomId, playerId]);
+  }, [connected, roomId, playerId, fetchHand]);
 
   // Subscribe to room-wide public topic whenever roomId changes
   useEffect(() => {
@@ -152,16 +191,18 @@ export const GameProvider = ({ children }) => {
         showToast(data.message);
       }
 
-      // Synchronize player identity and judge/submitted status
       if (data.players) {
+        const currentPid = playerIdRef.current;
+        const currentUname = usernameRef.current;
         const me = data.players.find((p) => 
-          (playerId && p.id === playerId) ||
-          (username && p.username.trim().toLowerCase() === username.trim().toLowerCase())
+          (currentPid && p.id === currentPid) ||
+          (currentUname && p.username.trim().toLowerCase() === currentUname.trim().toLowerCase())
         );
         if (me) {
-          if (!playerId || playerId !== me.id) {
+          if (currentPid !== me.id) {
             setPlayerId(me.id);
             sessionStorage.setItem('cah_playerId', me.id);
+            playerIdRef.current = me.id;
           }
           setHasSubmitted(Boolean(me.hasSubmitted));
           setIsJudge(Boolean(me.isJudge));
@@ -172,7 +213,7 @@ export const GameProvider = ({ children }) => {
     return () => {
       unsubRoom();
     };
-  }, [roomId, playerId, username, showToast]);
+  }, [roomId, showToast]);
 
   // Subscribe to player-specific hand topic when roomId and playerId are known
   useEffect(() => {
@@ -198,19 +239,24 @@ export const GameProvider = ({ children }) => {
 
   // Request hand on demand
   const requestHand = useCallback(() => {
-    if (roomId) {
-      stompService.send('/app/room.hand', { roomId, playerId });
+    const currentRoom = roomIdRef.current;
+    const currentPid = playerIdRef.current;
+    if (currentRoom) {
+      stompService.send('/app/room.hand', { roomId: currentRoom, playerId: currentPid });
+      if (currentPid) {
+        fetchHand(currentRoom, currentPid);
+      }
     }
-  }, [roomId, playerId]);
+  }, [fetchHand]);
 
   // Auto-request hand if in SUBMITTING phase, not judge, and hand is empty
   useEffect(() => {
-    if (roomState?.phase === 'SUBMITTING' && !isJudge && myHand.length === 0 && roomId) {
+    if (roomState?.phase === 'SUBMITTING' && !isJudge && myHand.length === 0 && roomId && playerId) {
       requestHand();
     }
-  }, [roomState?.phase, isJudge, myHand.length, roomId, requestHand]);
+  }, [roomState?.phase, isJudge, myHand.length, roomId, playerId, requestHand]);
 
-  // Game actions
+  // Game actions with dual-path execution (STOMP + REST) to ensure zero stuck actions on production
   const createRoom = useCallback(async (name) => {
     const trimmed = name.trim();
     if (!trimmed) return;
@@ -266,41 +312,129 @@ export const GameProvider = ({ children }) => {
       sessionStorage.setItem('cah_roomId', data.roomId);
       sessionStorage.setItem('cah_playerId', data.playerId);
       showToast(`Joined room: ${data.roomId}`);
+      fetchHand(data.roomId, data.playerId);
     } catch (err) {
       console.warn('REST join failed, falling back to STOMP:', err);
       setRoomId(upperCode);
       sessionStorage.setItem('cah_roomId', upperCode);
       stompService.send('/app/room.join', { roomId: upperCode, username: trimmedName });
     }
-  }, [showToast]);
+  }, [showToast, fetchHand]);
 
-  const startGame = useCallback((maxRounds, timerSeconds) => {
-    if (!roomId) return;
-    stompService.send('/app/room.start', { roomId, playerId, maxRounds, timerSeconds });
-  }, [roomId, playerId]);
+  const startGame = useCallback(async (maxRounds, timerSeconds) => {
+    const currentRoom = roomIdRef.current;
+    const currentPid = playerIdRef.current;
+    if (!currentRoom) return;
 
-  const submitCards = useCallback((cardIds) => {
-    if (!roomId || !cardIds || cardIds.length === 0) return;
-    stompService.send('/app/room.submit', { roomId, playerId, cardIds });
-  }, [roomId, playerId]);
+    // Send via STOMP if connected
+    stompService.send('/app/room.start', {
+      roomId: currentRoom,
+      playerId: currentPid,
+      maxRounds,
+      timerSeconds,
+    });
 
-  const judgeSubmission = useCallback((winningSubmissionId) => {
-    if (!roomId || !winningSubmissionId) return;
-    stompService.send('/app/room.judge', { roomId, playerId, judgeId: playerId, winningSubmissionId });
-  }, [roomId, playerId]);
+    // Also call REST endpoint to guarantee start even if socket has reconnect jitter
+    try {
+      const res = await fetch(`${API_BASE}/api/room/start`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: currentRoom,
+          playerId: currentPid,
+          maxRounds,
+          timerSeconds,
+        }),
+      });
+      if (res.ok) {
+        const state = await res.json();
+        setRoomState(state);
+        if (currentPid) {
+          fetchHand(currentRoom, currentPid);
+        }
+      } else {
+        const err = await res.json().catch(() => ({}));
+        if (err.error) showToast(err.error, true);
+      }
+    } catch (err) {
+      // network fallback handled by STOMP or subsequent polling
+    }
+  }, [fetchHand, showToast]);
 
-  const nextRound = useCallback(() => {
-    if (!roomId) return;
-    stompService.send('/app/room.next-round', { roomId, playerId });
-  }, [roomId, playerId]);
+  const submitCards = useCallback(async (cardIds) => {
+    const currentRoom = roomIdRef.current;
+    const currentPid = playerIdRef.current;
+    if (!currentRoom || !cardIds || cardIds.length === 0) return;
+
+    setHasSubmitted(true);
+    stompService.send('/app/room.submit', { roomId: currentRoom, playerId: currentPid, cardIds });
+
+    try {
+      await fetch(`${API_BASE}/api/room/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: currentRoom, playerId: currentPid, cardIds }),
+      });
+    } catch (e) {
+      // handled by STOMP
+    }
+  }, []);
+
+  const judgeSubmission = useCallback(async (winningSubmissionId) => {
+    const currentRoom = roomIdRef.current;
+    const currentPid = playerIdRef.current;
+    if (!currentRoom || !winningSubmissionId) return;
+
+    stompService.send('/app/room.judge', {
+      roomId: currentRoom,
+      playerId: currentPid,
+      judgeId: currentPid,
+      winningSubmissionId,
+    });
+
+    try {
+      await fetch(`${API_BASE}/api/room/judge`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          roomId: currentRoom,
+          playerId: currentPid,
+          judgeId: currentPid,
+          winningSubmissionId,
+        }),
+      });
+    } catch (e) {
+      // handled by STOMP
+    }
+  }, []);
+
+  const nextRound = useCallback(async () => {
+    const currentRoom = roomIdRef.current;
+    const currentPid = playerIdRef.current;
+    if (!currentRoom) return;
+
+    stompService.send('/app/room.next-round', { roomId: currentRoom, playerId: currentPid });
+
+    try {
+      await fetch(`${API_BASE}/api/room/next-round`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomId: currentRoom, playerId: currentPid }),
+      });
+    } catch (e) {
+      // handled by STOMP
+    }
+  }, []);
 
   const leaveRoom = useCallback(async () => {
-    if (roomId && playerId) {
+    const currentRoom = roomIdRef.current;
+    const currentPid = playerIdRef.current;
+    if (currentRoom && currentPid) {
       try {
         await fetch(`${API_BASE}/api/room/leave`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ roomId, playerId }),
+          body: JSON.stringify({ roomId: currentRoom, playerId: currentPid }),
         });
       } catch (e) {
         // ignore
@@ -312,10 +446,9 @@ export const GameProvider = ({ children }) => {
     setPlayerId('');
     sessionStorage.removeItem('cah_roomId');
     sessionStorage.removeItem('cah_playerId');
-    // Reconnect to get clean session
     stompService.disconnect();
     stompService.connect().then(() => setConnected(true));
-  }, [roomId, playerId]);
+  }, []);
 
   const currentMe = roomState?.players?.find((p) => 
     (playerId && p.id === playerId) || 
@@ -347,6 +480,7 @@ export const GameProvider = ({ children }) => {
         nextRound,
         leaveRoom,
         requestHand,
+        fetchHand,
       }}
     >
       {children}
