@@ -9,7 +9,7 @@ export const PlayerList = () => {
   const winningScore = roomState?.winningScore || 7;
 
   return (
-    <div className="glass-panel" style={{ padding: '20px 24px' }}>
+    <div className="glass-panel" style={{ padding: 'clamp(14px, 3vw, 20px)' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#f8fafc', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Players ({players.length})

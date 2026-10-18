@@ -77,13 +77,13 @@ export const Hand = () => {
   }
 
   return (
-    <div style={{ marginTop: 24 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+    <div style={{ marginTop: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14, flexWrap: 'wrap', gap: 10 }}>
         <div>
-          <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#f8fafc' }}>
+          <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: '#f8fafc' }}>
             Your Hand ({myHand.length} cards)
           </h3>
-          <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>
+          <p style={{ fontSize: '0.82rem', color: '#94a3b8' }}>
             Pick {pickCount} {pickCount > 1 ? 'cards' : 'card'} to play ({selectedCardIds.length}/{pickCount} selected)
           </p>
         </div>
@@ -92,21 +92,14 @@ export const Hand = () => {
           className="btn btn-primary"
           onClick={handleSubmit}
           disabled={selectedCardIds.length !== pickCount}
+          style={{ padding: '10px 18px', fontSize: '0.9rem' }}
         >
           <Send size={16} />
           Submit {selectedCardIds.length > 0 ? `(${selectedCardIds.length}/${pickCount})` : ''}
         </button>
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          gap: 16,
-          overflowX: 'auto',
-          paddingBottom: 20,
-          paddingTop: 10,
-        }}
-      >
+      <div className="hand-scroll-track">
         {myHand.map((card) => (
           <ResponseCard
             key={card.id}
@@ -116,6 +109,15 @@ export const Hand = () => {
           />
         ))}
       </div>
+
+      {/* Mobile-friendly bottom action button when cards are selected */}
+      {selectedCardIds.length === pickCount && (
+        <div className="mobile-sticky-bar animate-fade-in">
+          <button className="btn btn-primary pulse-glow" onClick={handleSubmit}>
+            <Send size={18} /> Submit {pickCount > 1 ? `${pickCount} Cards` : 'Card'} Now
+          </button>
+        </div>
+      )}
     </div>
   );
 };

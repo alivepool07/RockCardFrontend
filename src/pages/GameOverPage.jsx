@@ -35,32 +35,32 @@ export const GameOverPage = () => {
   }, []);
 
   return (
-    <div style={{ maxWidth: 720, margin: '20px auto', padding: '0 20px' }}>
-      <div className="glass-panel animate-fade-in pulse-glow" style={{ padding: 48, textAlign: 'center', marginBottom: 32 }}>
+    <div className="page-container" style={{ maxWidth: 720, margin: '20px auto' }}>
+      <div className="glass-panel animate-fade-in pulse-glow" style={{ padding: 'clamp(24px, 5vw, 48px)', textAlign: 'center', marginBottom: 24 }}>
         <div
           style={{
-            width: 80,
-            height: 80,
+            width: 70,
+            height: 70,
             borderRadius: '50%',
             background: 'linear-gradient(135deg, #f59e0b, #e11d48)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            margin: '0 auto 20px',
+            margin: '0 auto 16px',
             boxShadow: '0 10px 25px rgba(245, 158, 11, 0.4)',
           }}
         >
-          <Trophy size={42} color="#fff" />
+          <Trophy size={36} color="#fff" />
         </div>
 
         <span className="badge badge-judge" style={{ marginBottom: 12 }}>
           GAME OVER
         </span>
 
-        <h2 style={{ fontSize: '2.5rem', fontWeight: 800, color: '#fff', marginBottom: 8 }}>
+        <h2 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)', fontWeight: 800, color: '#fff', marginBottom: 6 }}>
           {winner.username} Wins!
         </h2>
-        <p style={{ color: '#94a3b8', fontSize: '1.1rem', marginBottom: 28 }}>
+        <p style={{ color: '#94a3b8', fontSize: '1rem', marginBottom: 24 }}>
           With a crushing total of <strong style={{ color: '#fbbf24' }}>{winner.score} points</strong>.
         </p>
 

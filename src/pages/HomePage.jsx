@@ -21,34 +21,34 @@ export const HomePage = () => {
   };
 
   return (
-    <div style={{ maxWidth: 960, margin: '40px auto', padding: '0 20px' }}>
+    <div className="page-container" style={{ maxWidth: 860, margin: '20px auto' }}>
       {/* Hero Section */}
-      <div style={{ textAlign: 'center', marginBottom: 48 }} className="animate-fade-in">
+      <div style={{ textAlign: 'center', marginBottom: 32 }} className="animate-fade-in">
         <div
           style={{
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
-            padding: '6px 16px',
+            padding: '6px 14px',
             borderRadius: 999,
             background: 'rgba(124, 58, 237, 0.15)',
             border: '1px solid rgba(124, 58, 237, 0.3)',
             color: '#c4b5fd',
-            fontSize: '0.85rem',
+            fontSize: '0.8rem',
             fontWeight: 700,
-            marginBottom: 20,
+            marginBottom: 16,
           }}
         >
-          <Sparkles size={16} /> Real-Time STOMP Multiplayer Game
+          <Sparkles size={15} /> Real-Time Multiplayer Card Game
         </div>
 
         <h1
           style={{
-            fontSize: '3.5rem',
+            fontSize: 'clamp(2.2rem, 6vw, 3.5rem)',
             fontWeight: 800,
-            lineHeight: 1.1,
+            lineHeight: 1.15,
             letterSpacing: '-0.03em',
-            marginBottom: 16,
+            marginBottom: 12,
             background: 'linear-gradient(135deg, #ffffff 30%, #94a3b8 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
@@ -57,39 +57,18 @@ export const HomePage = () => {
           Cards of Mayhem
         </h1>
 
-        <p style={{ fontSize: '1.2rem', color: '#94a3b8', maxWidth: 600, margin: '0 auto' }}>
-          The wildly irreverent party game for horrible people. Fast, synchronized, and completely in your browser.
+        <p style={{ fontSize: 'clamp(0.95rem, 3vw, 1.15rem)', color: '#94a3b8', maxWidth: 540, margin: '0 auto', padding: '0 8px' }}>
+          The wildly irreverent party game. Fast, synchronized, and completely in your browser.
         </p>
-
-        <div
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 10,
-            padding: '8px 16px',
-            borderRadius: 10,
-            background: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.35)',
-            marginTop: 18,
-            color: '#fca5a5',
-            fontSize: '0.85rem',
-            fontWeight: 600,
-          }}
-        >
-          <span style={{ background: '#ef4444', color: '#fff', padding: '2px 6px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 800 }}>
-            18+ ONLY
-          </span>
-          <span>Unhinged Adults Edition: Contains explicit adult humor, bedroom chaos & dark themes.</span>
-        </div>
       </div>
 
       {/* Main Action Card */}
       <div
         className="glass-panel animate-fade-in"
         style={{
-          maxWidth: 500,
+          maxWidth: 480,
           margin: '0 auto',
-          padding: 36,
+          padding: 'clamp(20px, 5vw, 36px)',
           boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
         }}
       >

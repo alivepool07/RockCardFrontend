@@ -35,15 +35,8 @@ export const GamePage = () => {
   }, [deadlineMs, phase]);
 
   return (
-    <div style={{ maxWidth: 1280, margin: '0 auto', padding: '0 20px' }}>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) 280px',
-          gap: 24,
-          alignItems: 'start',
-        }}
-      >
+    <div className="page-container" style={{ maxWidth: 1280, margin: '0 auto' }}>
+      <div className="game-grid">
         {/* Main Stage */}
         <div>
           {/* Phase Banner */}

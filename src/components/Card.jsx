@@ -6,17 +6,17 @@ export const PromptCard = ({ prompt }) => {
   return (
     <div className="prompt-card animate-fade-in">
       <div>
-        <span className="badge badge-host" style={{ marginBottom: 16 }}>
+        <span className="badge badge-host" style={{ marginBottom: 12 }}>
           Prompt Card
         </span>
-        <h2 style={{ fontSize: '1.25rem', lineHeight: 1.4, fontWeight: 700, color: '#f8fafc' }}>
+        <h2 className="prompt-card-text">
           {prompt.text}
         </h2>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
-        <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: 700, letterSpacing: '0.05em' }}>
-          🔞 18+ ADULTS ONLY
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18 }}>
+        <span style={{ fontSize: '0.75rem', color: '#64748b', fontWeight: 700, letterSpacing: '0.05em' }}>
+          UNHINGED EDITION
         </span>
         {prompt.pickCount > 1 && (
           <span className="badge badge-judge">
@@ -40,16 +40,16 @@ export const ResponseCard = ({ card, selected, onClick, isWinner, disabled }) =>
         opacity: disabled ? 0.75 : 1,
       }}
     >
-      <p style={{ fontSize: '1rem', fontWeight: 600, lineHeight: 1.4, color: '#0f172a' }}>
+      <p className="response-card-text">
         {card.text}
       </p>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-        <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>
-          RESPONSE · 18+
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', paddingTop: 8 }}>
+        <span style={{ fontSize: '0.72rem', color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>
+          RESPONSE
         </span>
         {selected && (
-          <span style={{ fontSize: '0.75rem', background: '#7c3aed', color: '#fff', borderRadius: 999, padding: '2px 8px', fontWeight: 700 }}>
+          <span style={{ fontSize: '0.72rem', background: '#7c3aed', color: '#fff', borderRadius: 999, padding: '2px 8px', fontWeight: 700 }}>
             SELECTED
           </span>
         )}
@@ -57,3 +57,4 @@ export const ResponseCard = ({ card, selected, onClick, isWinner, disabled }) =>
     </div>
   );
 };
+

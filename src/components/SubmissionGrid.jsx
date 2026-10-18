@@ -24,10 +24,11 @@ export const SubmissionGrid = () => {
       </div>
 
       <div
+        className="submissions-grid"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))',
-          gap: 20,
+          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+          gap: 16,
         }}
       >
         {submissions.map((sub, idx) => (
@@ -35,11 +36,11 @@ export const SubmissionGrid = () => {
             key={sub.submissionId}
             className="glass-panel animate-fade-in"
             style={{
-              padding: 16,
+              padding: 'clamp(12px, 3vw, 16px)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: 12,
+              gap: 10,
               background: 'rgba(255, 255, 255, 0.03)',
             }}
           >

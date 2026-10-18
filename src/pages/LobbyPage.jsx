@@ -19,21 +19,16 @@ export const LobbyPage = () => {
   };
 
   return (
-    <div style={{ maxWidth: 860, margin: '20px auto', padding: '0 20px' }}>
-      <div className="glass-panel animate-fade-in" style={{ padding: 40, textAlign: 'center', marginBottom: 32 }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-          <span className="badge badge-host">
-            Game Lobby
-          </span>
-          <span className="badge badge-judge" style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#fca5a5' }}>
-            🔞 18+ Unhinged Deck
-          </span>
-        </div>
+    <div className="page-container" style={{ maxWidth: 860, margin: '20px auto' }}>
+      <div className="glass-panel animate-fade-in" style={{ padding: 'clamp(20px, 4vw, 40px)', textAlign: 'center', marginBottom: 24 }}>
+        <span className="badge badge-host" style={{ marginBottom: 14 }}>
+          Game Lobby
+        </span>
 
-        <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: 12 }}>
+        <h2 style={{ fontSize: 'clamp(1.4rem, 4vw, 1.8rem)', fontWeight: 800, color: '#fff', marginBottom: 8 }}>
           Waiting for Players
         </h2>
-        <p style={{ color: '#94a3b8', fontSize: '1rem', maxWidth: 500, margin: '0 auto 24px' }}>
+        <p style={{ color: '#94a3b8', fontSize: '0.95rem', maxWidth: 460, margin: '0 auto 20px' }}>
           Share your room code with friends so they can join from their phones or laptops.
         </p>
 
@@ -43,24 +38,27 @@ export const LobbyPage = () => {
           style={{
             display: 'inline-flex',
             alignItems: 'center',
-            gap: 16,
+            justifyContent: 'center',
+            gap: 12,
             background: 'rgba(124, 58, 237, 0.15)',
             border: '2px dashed rgba(124, 58, 237, 0.4)',
             borderRadius: 16,
-            padding: '16px 36px',
+            padding: '12px clamp(16px, 4vw, 32px)',
             cursor: 'pointer',
             transition: 'all 0.2s ease',
+            maxWidth: '100%',
+            flexWrap: 'wrap',
           }}
           title="Click to copy code"
         >
-          <span style={{ fontSize: '2.5rem', fontWeight: 800, letterSpacing: '0.25em', color: '#c4b5fd' }}>
+          <span style={{ fontSize: 'clamp(1.8rem, 6vw, 2.5rem)', fontWeight: 800, letterSpacing: '0.15em', color: '#c4b5fd' }}>
             {roomId}
           </span>
           <button
             className="btn btn-secondary"
-            style={{ padding: '8px 16px', borderRadius: 8, fontSize: '0.85rem' }}
+            style={{ padding: '8px 14px', borderRadius: 8, fontSize: '0.85rem' }}
           >
-            {copied ? <Check size={16} color="#10b981" /> : <Copy size={16} />}
+            {copied ? <Check size={15} color="#10b981" /> : <Copy size={15} />}
             {copied ? 'Copied!' : 'Copy Code'}
           </button>
         </div>
@@ -159,7 +157,7 @@ export const LobbyPage = () => {
             <div>
               <button
                 className="btn btn-primary pulse-glow"
-                style={{ padding: '16px 48px', fontSize: '1.15rem' }}
+                style={{ width: '100%', maxWidth: 360, padding: '16px 28px', fontSize: '1.1rem' }}
                 onClick={() => startGame(maxRounds, timerSeconds)}
                 disabled={!canStart}
               >
@@ -180,8 +178,8 @@ export const LobbyPage = () => {
       </div>
 
       {/* Roster of Joined Players */}
-      <div className="glass-panel animate-fade-in" style={{ padding: 32 }}>
-        <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: '#fff', marginBottom: 20, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div className="glass-panel animate-fade-in" style={{ padding: 'clamp(18px, 4vw, 32px)' }}>
+        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#fff', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
           <Users size={18} color="#7c3aed" /> Roster ({players.length} Players)
         </h3>
 
@@ -193,8 +191,8 @@ export const LobbyPage = () => {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-              gap: 16,
+              gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+              gap: 12,
             }}
           >
             {players.map((p) => (
