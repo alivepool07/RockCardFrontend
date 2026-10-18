@@ -38,38 +38,39 @@ export const GamePage = () => {
     <div className="page-container" style={{ maxWidth: 1280, margin: '0 auto' }}>
       <div className="game-grid">
         {/* Main Stage */}
-        <div>
+        <div style={{ minWidth: 0, overflow: 'hidden' }}>
           {/* Phase Banner */}
           <div
             style={{
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              marginBottom: 20,
+              marginBottom: 14,
               flexWrap: 'wrap',
-              gap: 12,
+              gap: 8,
             }}
           >
-            <div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                 <span className="badge badge-judge">
-                  <Crown size={12} /> Judge: {judge}
+                  <Crown size={11} /> Judge: {judge}
                 </span>
                 <span
                   style={{
-                    fontSize: '0.8rem',
+                    fontSize: '0.75rem',
                     fontWeight: 700,
                     color: '#c4b5fd',
                     background: 'rgba(124, 58, 237, 0.2)',
-                    padding: '4px 10px',
-                    borderRadius: 20,
+                    padding: '3px 8px',
+                    borderRadius: 16,
                     border: '1px solid rgba(124, 58, 237, 0.3)',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  Round {currentRound} of {maxRounds}
+                  Round {currentRound}/{maxRounds}
                 </span>
               </div>
-              <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginTop: 6 }}>
+              <h2 style={{ fontSize: 'clamp(1.05rem, 3.5vw, 1.35rem)', fontWeight: 800, color: '#fff', marginTop: 4 }}>
                 {phase === 'SUBMITTING' && 'Card Submission Phase'}
                 {phase === 'JUDGING' && 'Judging & Deliberation'}
                 {phase === 'ROUND_OVER' && 'Round Results'}
@@ -82,19 +83,20 @@ export const GamePage = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 8,
-                  padding: '8px 16px',
-                  borderRadius: 12,
+                  gap: 6,
+                  padding: '6px 12px',
+                  borderRadius: 10,
                   background: timeLeft <= 10 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(255, 255, 255, 0.06)',
                   border: timeLeft <= 10 ? '1px solid #ef4444' : '1px solid rgba(255, 255, 255, 0.12)',
                   animation: timeLeft <= 10 ? 'pulse 1s infinite' : 'none',
                   transition: 'all 0.2s ease',
+                  flexShrink: 0,
                 }}
               >
-                <Clock size={18} color={timeLeft <= 10 ? '#ef4444' : '#94a3b8'} />
+                <Clock size={16} color={timeLeft <= 10 ? '#ef4444' : '#94a3b8'} />
                 <span
                   style={{
-                    fontSize: '1.1rem',
+                    fontSize: '1rem',
                     fontWeight: 800,
                     fontVariantNumeric: 'tabular-nums',
                     color: timeLeft <= 10 ? '#f87171' : '#f8fafc',
@@ -107,7 +109,7 @@ export const GamePage = () => {
           </div>
 
           {/* Active Prompt Card */}
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
             <PromptCard prompt={roomState?.currentPrompt} />
           </div>
 
