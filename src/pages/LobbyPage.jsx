@@ -21,9 +21,14 @@ export const LobbyPage = () => {
   return (
     <div style={{ maxWidth: 860, margin: '20px auto', padding: '0 20px' }}>
       <div className="glass-panel animate-fade-in" style={{ padding: 40, textAlign: 'center', marginBottom: 32 }}>
-        <span className="badge badge-host" style={{ marginBottom: 16 }}>
-          Game Lobby
-        </span>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+          <span className="badge badge-host">
+            Game Lobby
+          </span>
+          <span className="badge badge-judge" style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: '#fca5a5' }}>
+            🔞 18+ Unhinged Deck
+          </span>
+        </div>
 
         <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: 12 }}>
           Waiting for Players

@@ -15,8 +15,8 @@ export const PromptCard = ({ prompt }) => {
       </div>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 24 }}>
-        <span style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>
-          PARTY EDITION
+        <span style={{ fontSize: '0.8rem', color: '#f87171', fontWeight: 700, letterSpacing: '0.05em' }}>
+          🔞 18+ ADULTS ONLY
         </span>
         {prompt.pickCount > 1 && (
           <span className="badge badge-judge">
@@ -46,7 +46,7 @@ export const ResponseCard = ({ card, selected, onClick, isWinner, disabled }) =>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
         <span style={{ fontSize: '0.75rem', color: '#94a3b8', fontWeight: 700, letterSpacing: '0.05em' }}>
-          RESPONSE
+          RESPONSE · 18+
         </span>
         {selected && (
           <span style={{ fontSize: '0.75rem', background: '#7c3aed', color: '#fff', borderRadius: 999, padding: '2px 8px', fontWeight: 700 }}>

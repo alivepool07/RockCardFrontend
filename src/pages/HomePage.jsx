@@ -60,6 +60,27 @@ export const HomePage = () => {
         <p style={{ fontSize: '1.2rem', color: '#94a3b8', maxWidth: 600, margin: '0 auto' }}>
           The wildly irreverent party game for horrible people. Fast, synchronized, and completely in your browser.
         </p>
+
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 10,
+            padding: '8px 16px',
+            borderRadius: 10,
+            background: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.35)',
+            marginTop: 18,
+            color: '#fca5a5',
+            fontSize: '0.85rem',
+            fontWeight: 600,
+          }}
+        >
+          <span style={{ background: '#ef4444', color: '#fff', padding: '2px 6px', borderRadius: 6, fontSize: '0.75rem', fontWeight: 800 }}>
+            18+ ONLY
+          </span>
+          <span>Unhinged Adults Edition: Contains explicit adult humor, bedroom chaos & dark themes.</span>
+        </div>
       </div>
 
       {/* Main Action Card */}
